@@ -393,7 +393,9 @@ def shares():
         JOIN files f ON f.id=s.file_id
         WHERE s.owner_id=? ORDER BY s.created_at DESC
     """, (session["user_id"],)).fetchall()
-    return render_template("shares.html", shares=rows)
+
+    # Pass current UTC time to shares.html for expiry-status comparisons.
+    return render_template("shares.html", shares=rows, now_iso=iso_now())
 
 @app.route("/share/<token>", methods=["GET", "POST"])
 def shared_file(token):
@@ -491,8 +493,3 @@ def gone(_error):
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=os.environ.get("FLASK_DEBUG", "0") == "1")
-
-
-@app.context_processor
-def inject_helpers():
-    return {"now_iso": iso_now()}

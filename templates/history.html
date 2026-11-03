@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block title %}Activity history{% endblock %}{% block content %}
+<div class="page-heading"><span class="eyebrow">AUDIT TRAIL</span><h1 class="fw-bold mt-2">Access history</h1><p class="text-secondary">Recent events recorded for your files.</p></div>
+<div class="panel">{% if logs %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Event</th><th>File</th><th>IP address</th><th>Time (UTC)</th></tr></thead><tbody>{% for l in logs %}<tr><td><span class="badge text-bg-secondary">{{ l.event.replace('_',' ') }}</span></td><td>{{ l.original_name or 'Deleted file' }}</td><td>{{ l.ip_address or 'Unavailable' }}</td><td>{{ l.created_at[:19].replace('T',' ') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><h5>No activity yet</h5><p class="text-secondary">File and share activity will appear here.</p></div>{% endif %}</div>
+{% endblock %}

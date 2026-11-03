@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Upload file{% endblock %}{% block content %}
+<div class="page-heading"><span class="eyebrow">ENCRYPTED STORAGE</span><h1 class="fw-bold mt-2">Upload a file</h1><p class="text-secondary">Your file is encrypted before it is saved to storage.</p></div>
+<div class="panel narrow-panel"><form method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label class="upload-zone w-100"><input type="file" name="file" required id="file-input"><span class="upload-symbol">↑</span><strong id="file-label">Choose a file or drag it here</strong><span class="small text-secondary">Maximum 25 MB</span></label>
+<p class="small text-secondary mt-3">Accepted formats: {{ allowed }}</p><div class="security-note mt-4"><strong>Security note</strong><br><span class="small text-secondary">The application uses AES-256-GCM authenticated encryption. Keep your server master key safe; losing it makes stored files unrecoverable.</span></div>
+<button class="btn btn-primary w-100 mt-4">Encrypt and upload</button></form></div>
+{% endblock %}

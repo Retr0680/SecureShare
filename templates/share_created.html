@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}Link created{% endblock %}{% block content %}
+<div class="auth-wrap"><div class="auth-card"><div class="feature-icon">✓</div><h2 class="fw-bold mt-3">Your link is ready</h2><p class="text-secondary">Share the URL with the recipient. Send the password through a separate channel.</p>
+<label class="form-label">Secure sharing URL</label><div class="input-group"><input id="share-url" class="form-control" value="{{ share_url }}" readonly><button class="btn btn-outline-light" type="button" data-copy="#share-url">Copy</button></div>
+<p class="small text-secondary mt-3">Expires: {{ expires[:19].replace('T',' ') }} UTC</p><div class="security-note small">The sharing password is not included in the URL.</div><a class="btn btn-primary w-100 mt-4" href="{{ url_for('shares') }}">Manage shared links</a></div></div>
+{% endblock %}

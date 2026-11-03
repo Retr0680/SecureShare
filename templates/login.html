@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}Log in{% endblock %}{% block content %}
+<div class="auth-wrap"><div class="auth-card"><span class="eyebrow">WELCOME BACK</span><h2 class="fw-bold mt-2">Log in to SecureShare</h2><p class="text-secondary">Access your encrypted workspace.</p>
+<form method="post" class="mt-4"><input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+<label class="form-label">Username or email</label><input class="form-control mb-3" name="identity" required autocomplete="username">
+<label class="form-label">Password</label><input class="form-control mb-4" type="password" name="password" required autocomplete="current-password">
+<button class="btn btn-primary w-100">Log in</button></form>
+<p class="small text-secondary mt-4 mb-0">New here? <a href="{{ url_for('register') }}">Create an account</a></p></div></div>
+{% endblock %}

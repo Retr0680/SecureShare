@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block title %}Secure file sharing{% endblock %}
+{% block content %}
+<section class="hero rounded-4 p-4 p-lg-5 mb-5">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <span class="eyebrow">PRIVATE BY DESIGN</span>
+      <h1 class="display-4 fw-bold mt-3">Your files.<br><span class="gradient-text">Your control.</span></h1>
+      <p class="lead text-secondary mt-3">Encrypt documents before they reach storage. Share them with password protection, expiration dates and download controls.</p>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get started <span aria-hidden="true">→</span></a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Log in</a>
+      </div>
+      <div class="d-flex flex-wrap gap-3 mt-4 small text-secondary"><span>✓ AES-256-GCM</span><span>✓ Expiring links</span><span>✓ Access history</span></div>
+    </div>
+    <div class="col-lg-5">
+      <div class="preview-card">
+        <div class="d-flex justify-content-between align-items-center mb-4"><span class="fw-semibold">Secure transfer</span><span class="status-dot">Protected</span></div>
+        <div class="file-tile"><div class="file-icon">PDF</div><div class="flex-grow-1"><strong>project-report.pdf</strong><div class="small text-secondary">2.4 MB · Encrypted</div></div><span class="text-success">✓</span></div>
+        <div class="progress mt-3"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="d-flex justify-content-between small text-secondary mt-2"><span>Encryption complete</span><span>100%</span></div>
+        <hr class="border-secondary-subtle my-4">
+        <div class="d-flex justify-content-between small"><span class="text-secondary">Link protection</span><strong>Password + expiry</strong></div>
+        <div class="d-flex justify-content-between small mt-3"><span class="text-secondary">Access control</span><strong>Download enabled</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="row g-3">
+  <div class="col-md-4"><div class="feature-card h-100"><div class="feature-icon">01</div><h5>Encrypt at rest</h5><p class="text-secondary mb-0">Files are encrypted using authenticated AES-256-GCM before being written to disk.</p></div></div>
+  <div class="col-md-4"><div class="feature-card h-100"><div class="feature-icon">02</div><h5>Share securely</h5><p class="text-secondary mb-0">Protect links with a separate password and an expiration date.</p></div></div>
+  <div class="col-md-4"><div class="feature-card h-100"><div class="feature-icon">03</div><h5>Stay in control</h5><p class="text-secondary mb-0">Revoke links, disable downloads and review recorded access events.</p></div></div>
+</div>
+{% endblock %}

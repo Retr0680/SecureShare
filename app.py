@@ -5,6 +5,8 @@ import hmac
 import base64
 import secrets
 import sqlite3
+import time
+from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
@@ -27,6 +29,11 @@ STORAGE.mkdir(parents=True, exist_ok=True)
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
+# Lightweight per-process throttling for the educational single-process MVP.
+# Use a shared rate-limit store (e.g. Redis) when deploying multiple workers.
+_AUTH_ATTEMPTS = defaultdict(deque)
+_AUTH_LIMIT = 10
+_AUTH_WINDOW_SECONDS = 300
 app.config.update(
     SECRET_KEY=os.environ.get("FLASK_SECRET_KEY", ""),
     MAX_CONTENT_LENGTH=25 * 1024 * 1024,  # 25 MiB demo limit
@@ -133,6 +140,16 @@ app.jinja_env.globals["csrf_token"] = csrf_token
 
 @app.before_request
 def protect_post_requests():
+    # Throttle password-guessing against login and public share-unlock endpoints.
+    if request.method == "POST" and request.endpoint in {"login", "shared_file"}:
+        bucket_key = (request.endpoint, request.remote_addr or "unknown")
+        attempts = _AUTH_ATTEMPTS[bucket_key]
+        now = time.monotonic()
+        while attempts and now - attempts[0] > _AUTH_WINDOW_SECONDS:
+            attempts.popleft()
+        if len(attempts) >= _AUTH_LIMIT:
+            abort(429, "Too many attempts. Please wait a few minutes and try again.")
+        attempts.append(now)
     if request.method == "POST":
         supplied = request.form.get("_csrf", "")
         expected = session.get("_csrf", "")
@@ -251,6 +268,7 @@ def login():
         user = db().execute("SELECT * FROM users WHERE lower(username)=? OR email=?",
                             (identity, identity)).fetchone()
         if user and check_password_hash(user["password_hash"], password):
+            _AUTH_ATTEMPTS.pop(("login", request.remote_addr or "unknown"), None)
             session.clear()
             session["user_id"] = user["id"]
             flash("Welcome back.", "success")
@@ -271,10 +289,10 @@ def dashboard():
     user = current_user()
     files = db().execute("""
         SELECT f.*,
-        (SELECT COUNT(*) FROM shares s WHERE s.file_id=f.id AND s.revoked=0) AS share_count,
+        (SELECT COUNT(*) FROM shares s WHERE s.file_id=f.id AND s.revoked=0 AND s.expires_at>?) AS share_count,
         (SELECT COUNT(*) FROM access_logs l WHERE l.file_id=f.id AND l.event='download') AS download_count
         FROM files f WHERE f.owner_id=? ORDER BY f.created_at DESC
-    """, (user["id"],)).fetchall()
+    """, (iso_now(), user["id"])).fetchall()
     recent = db().execute("""
         SELECT l.*, f.original_name FROM access_logs l
         LEFT JOIN files f ON f.id=l.file_id
@@ -478,6 +496,12 @@ def too_large(_error):
 @app.errorhandler(400)
 def bad_request(error):
     return render_template("error.html", code=400, message=getattr(error, "description", "Bad request.")), 400
+
+@app.errorhandler(429)
+def too_many_requests(error):
+    response = render_template("error.html", code=429,
+                               message=getattr(error, "description", "Too many requests."))
+    return response, 429
 
 @app.errorhandler(403)
 def forbidden(error):

@@ -22,6 +22,7 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(secureshare, "STORAGE", tmp_path / "encrypted")
     secureshare.STORAGE.mkdir(parents=True)
     secureshare.init_db()
+    secureshare.ensure_schema_migrations()
     secureshare._AUTH_ATTEMPTS.clear()
     secureshare.app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
     with secureshare.app.test_client() as test_client:
